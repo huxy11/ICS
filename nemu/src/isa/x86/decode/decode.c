@@ -21,20 +21,15 @@ static inline make_DopHelper(I) {
  */
 /* sign immediate */
 static inline make_DopHelper(SI) {
-  assert(op->width == 1 || op->width == 4);
-
+  	op->simm = instr_fetch(pc, op->width);
+	switch (op->width) {
+		case 1:op->simm = (int8_t)op->simm;break;
+		case 2:op->simm = (int16_t)op->simm;break;
+		case 4:op->simm = (int32_t)op->simm;break;
+		default: assert(0);
+	}
   op->type = OP_TYPE_IMM;
-
-  /* TODO: Use instr_fetch() to read `op->width' bytes of memory
-   * pointed by 'pc'. Interpret the result as a signed immediate,
-   * and assign it to op->simm.
-   *
-   op->simm = ???
-   */
-  TODO();
-
   rtl_li(&op->val, op->simm);
-
   print_Dop(op->str, OP_STR_SIZE, "$0x%x", op->simm);
 }
 
@@ -96,6 +91,10 @@ static inline make_DopHelper(O) {
  */
 make_DHelper(G2E) {
   decode_op_rm(pc, id_dest, true, id_src, true);
+}
+make_DHelper(1bE2G) {
+	id_src->width = 1;
+	decode_op_rm(pc, id_dest, true, id_src, true);
 }
 
 make_DHelper(mov_G2E) {
@@ -186,13 +185,25 @@ make_DHelper(test_I) {
 }
 
 make_DHelper(SI2E) {
-  assert(id_dest->width == 2 || id_dest->width == 4);
   decode_op_rm(pc, id_dest, true, NULL, false);
-  id_src->width = 1;
   decode_op_SI(pc, id_src, true);
+	/*
   if (id_dest->width == 2) {
     id_src->val &= 0xffff;
   }
+	*/
+}
+make_DHelper(SIb2E) {
+  decode_op_rm(pc, id_dest, true, NULL, false);
+	id_src->width = 1;
+  decode_op_SI(pc, id_src, true);
+}
+make_DHelper(SI2A) {
+	decode_op_SI(pc, id_src, true);
+	id_dest->type = OP_TYPE_REG;
+	id_dest->reg = R_EAX;
+	id_dest->width = id_src->width;
+	rtl_lr(&id_dest->val, id_dest->reg, id_dest->width);
 }
 
 make_DHelper(SI_E2G) {

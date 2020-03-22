@@ -22,7 +22,28 @@ typedef struct {
   rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
   };
 };
-
+union{
+	uint32_t eflags;
+	struct {
+		uint32_t _CF:1;
+		uint32_t :1;
+		uint32_t _PF:1;
+		uint32_t :1;
+		uint32_t _AF:1;
+		uint32_t :1;
+		uint32_t _ZF:1;
+		uint32_t _SF:1;
+		uint32_t _TF:1;
+		uint32_t _IF:1;
+		uint32_t _DF:1;
+		uint32_t _OF:1;
+		uint32_t _IOPL:2;
+		uint32_t _NT:1;
+		uint32_t :1;
+		uint32_t _RF:1;
+		uint32_t _VM:1;
+	};
+};
   vaddr_t pc;
 
 } CPU_state;

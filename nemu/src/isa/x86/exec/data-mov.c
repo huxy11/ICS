@@ -6,14 +6,13 @@ make_EHelper(mov) {
 }
 
 make_EHelper(push) {
-  TODO();
-
+  rtl_push(&id_dest->val);
   print_asm_template1(push);
 }
 
 make_EHelper(pop) {
-  TODO();
-
+	rtl_pop(&id_dest->val);
+	operand_write(id_dest, &id_dest->val);
   print_asm_template1(pop);
 }
 
@@ -30,8 +29,10 @@ make_EHelper(popa) {
 }
 
 make_EHelper(leave) {
-  TODO();
-
+	rtl_lr(&s0, R_EBP, decinfo.src.width);
+	rtl_sr(R_ESP, &s0, decinfo.src.width);
+	rtl_pop(&s0);
+	rtl_sr(R_EBP, &s0, decinfo.src.width);
   print_asm("leave");
 }
 
@@ -73,4 +74,11 @@ make_EHelper(movzx) {
 make_EHelper(lea) {
   operand_write(id_dest, &id_src->addr);
   print_asm_template2(lea);
+}
+
+make_EHelper(xchg) {
+	rtl_lr(&t0, R_EAX, id_src->width);
+	rtl_sr(R_EAX, &id_src->val, id_src->width);
+	operand_write(id_src, &t0);
+	print_asm_template2(xchg);
 }

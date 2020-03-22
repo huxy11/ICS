@@ -33,11 +33,13 @@ static int cmd_c(char *args) {
 }
 static int cmd_si(char *args) {
 	char* arg = strtok(NULL, " ");
-	int n = 1;
+	uint32_t n = 1;
 	if (arg && atoi(arg))
 		n = atoi(arg);
+	/*
 	else 
 		Log("Invalid arg for cmd_si execute once.");
+		*/
 	cpu_exec(n);
 	return 0;
 }
@@ -60,7 +62,7 @@ static int cmd_x(char *args) {
 		arg = strtok(NULL, " ");
 		if (arg && strncmp(arg, "0x", 2) == 0) {
 			arg += 2;
-			if (arg && atoi(arg)) {
+			if (arg && atox(arg)) {
 				uint64_t addr = atox(arg);
 				int i = 0;
 				for (i = 0; i < n; ++i) {
@@ -132,11 +134,14 @@ static int cmd_dwp(char* args) {
 }
 static int cmd_test(char *args) {
 	char *arg = strtok(NULL, " ");
+	int32_t i;
 	if (arg) {
 		if (strcmp(arg, "reg_init") == 0) {
-			cpu.eax = 0;
-			cpu.edx = 0xF; 
-			printf("Set EAX to 0, EDX to 0xF\n");
+			for (i = R_EAX; i <= R_EDI; ++i) {
+				reg_l(i) = (i+1) * 0xFFF;
+			}	
+			reg_l(R_EBP) = 0x50000;
+			reg_l(R_ESP) = 0x50000;
 		} else if (strcmp(arg, "mem_init") == 0) {
 			vaddr_write(0x80000, 0xAAAAFFFF, 4);
 			printf("vaddr_write 0xAAAAFFFF to 0x80000\n");
@@ -207,10 +212,12 @@ static int cmd_help(char *args) {
 }
 
 void ui_mainloop(int is_batch_mode) {
+	/*
   if (is_batch_mode) {
     cmd_c(NULL);
     return;
   }
+	*/
 
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
