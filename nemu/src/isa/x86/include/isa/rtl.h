@@ -66,14 +66,14 @@ make_rtl_setget_eflags(AF)
 static inline void rtl_is_sub_overflow(rtlreg_t* dest,
     const rtlreg_t* res, const rtlreg_t* src1, const rtlreg_t* src2, int width) {
   // dest <- is_overflow(src1 - src2)
-	uint32_t s_bit = (1u << (4 * width - 1));
+	uint32_t s_bit = (1u << (8 * width - 1));
 	*dest = ((s(src1) ^ s(src2)) && (s(src1)^s(res))) ? 1 : 0;
 }
 
 static inline void rtl_is_sub_carry(rtlreg_t* dest,
-    const rtlreg_t* src1, const rtlreg_t* src2) {
+    const rtlreg_t* res, const rtlreg_t* src1) {
   // dest <- is_carry(src1 - src2)
-	*dest = (src1 > src2) ? 0 : 1;
+	*dest = (*res <= *src1) ? 0 : 1;
 	
 }
 
@@ -95,7 +95,7 @@ static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
 }
 
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
-	(*result & (1u << (width * 4 - 1))) ?  rtl_set1_SF() : rtl_reset_SF();
+	(*result & (1u << (width * 8 - 1))) ?  rtl_set1_SF() : rtl_reset_SF();
 }
 
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {

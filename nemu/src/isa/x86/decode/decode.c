@@ -82,8 +82,7 @@ static inline make_DopHelper(O) {
   if (load_val) {
     rtl_lm(&op->val, &op->addr, op->width);
   }
-
-  print_Dop(op->str, OP_STR_SIZE, "0x%x", op->addr);
+  print_Dop(op->str, OP_STR_SIZE, "(0x%x)", op->addr);
 }
 
 /* Eb <- Gb
@@ -91,10 +90,6 @@ static inline make_DopHelper(O) {
  */
 make_DHelper(G2E) {
   decode_op_rm(pc, id_dest, true, id_src, true);
-}
-make_DHelper(1bE2G) {
-	id_src->width = 1;
-	decode_op_rm(pc, id_dest, true, id_src, true);
 }
 
 make_DHelper(mov_G2E) {
@@ -110,6 +105,14 @@ make_DHelper(E2G) {
 
 make_DHelper(mov_E2G) {
   decode_op_rm(pc, id_src, true, id_dest, false);
+}
+make_DHelper(mov_1bE2G) {
+	id_src->width = 1;
+	decode_op_rm(pc, id_src, true, id_dest, false);
+}
+make_DHelper(mov_2bE2G) {
+	id_src->width = 2;
+	decode_op_rm(pc, id_src, true, id_dest, false);
 }
 
 make_DHelper(lea_M2G) {
@@ -185,13 +188,13 @@ make_DHelper(test_I) {
 }
 
 make_DHelper(SI2E) {
+  assert(id_dest->width == 2 || id_dest->width == 4);
   decode_op_rm(pc, id_dest, true, NULL, false);
+	id_src->width = 1;
   decode_op_SI(pc, id_src, true);
-	/*
   if (id_dest->width == 2) {
     id_src->val &= 0xffff;
   }
-	*/
 }
 make_DHelper(SIb2E) {
   decode_op_rm(pc, id_dest, true, NULL, false);

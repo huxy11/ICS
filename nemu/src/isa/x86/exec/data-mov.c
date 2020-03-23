@@ -29,13 +29,26 @@ make_EHelper(popa) {
 }
 
 make_EHelper(leave) {
-	rtl_lr(&s0, R_EBP, decinfo.src.width);
-	rtl_sr(R_ESP, &s0, decinfo.src.width);
+	uint32_t width = decinfo.isa.is_operand_size_16 ? 2 : 4;
+	rtl_lr(&s0, R_EBP, width);
+	rtl_sr(R_ESP, &s0, width);
 	rtl_pop(&s0);
-	rtl_sr(R_EBP, &s0, decinfo.src.width);
+	rtl_sr(R_EBP, &s0, width);
   print_asm("leave");
 }
+make_EHelper(cltd) {
+	uint32_t width = decinfo.isa.is_operand_size_16 ? 2 : 4;
+	rtl_lr(&s0, R_EAX, width);
+	rtl_sext(&s0, &s0, width);
+	if (s0 & 0x80000000)
+		rtl_li(&s0, 0xFFFFFFFF);
+	else
+		rtl_li(&s0, 0);
+	rtl_sr(R_EDX, &s0, width);
+	print_asm(decinfo.isa.is_operand_size_16 ? "cwtl" : "cltd");
+}
 
+/*
 make_EHelper(cltd) {
   if (decinfo.isa.is_operand_size_16) {
     TODO();
@@ -46,6 +59,7 @@ make_EHelper(cltd) {
 
   print_asm(decinfo.isa.is_operand_size_16 ? "cwtl" : "cltd");
 }
+*/
 
 make_EHelper(cwtl) {
   if (decinfo.isa.is_operand_size_16) {

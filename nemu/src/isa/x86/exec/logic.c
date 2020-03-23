@@ -4,17 +4,17 @@ static void _eflags(const rtlreg_t* dest, uint32_t width) {
 	rtl_update_ZFSF(dest, width);
 	rtl_reset_CF();
 	rtl_reset_OF();
-	/*
-	(re & (1 << (width * 8 - 1))) ? rtl_set1_SF() : rtl_reset_SF();
-	(re) ? rtl_reset_ZF() : rtl_set1_ZF();
-	uint32_t f = 1;
-	while(re) {
-		re ^= re & -re;
-		f = !f;
-	}
-	(f) ?  rtl_set1_PF() : rtl_reset_PF();	
-	*/
 }
+
+#define procedure(op)  \
+	rtl_sext(&id_src->val, &id_src->val, id_src->width); \
+	rtl_sext(&id_dest->val, &id_dest->val, id_dest->width); \
+	id_src->width = id_dest->width; \
+	rtl_ ## op(&id_dest->val, &id_dest->val, &id_src->val); \
+	operand_write(id_dest, &id_dest->val); \
+	_eflags(&id_dest->val, id_dest->width); \
+  print_asm_template2(op); \
+
 
 make_EHelper(test) {
 	rtl_and(&id_dest->val, &id_dest->val, &id_src->val);
@@ -23,24 +23,41 @@ make_EHelper(test) {
 }
 
 make_EHelper(and) {
+	/*
+	rtl_sext(&id_src->val, &id_src->val, id_src->width);
+	rtl_sext(&id_dest->val, &id_dest->val, id_dest->width);
+	id_src->width = id_dest->width;
 	rtl_and(&id_dest->val, &id_dest->val, &id_src->val);
 	operand_write(id_dest, &id_dest->val);
 	_eflags(&id_dest->val, id_dest->width);
   print_asm_template2(and);
+	*/
+	procedure(and)
+
 }
 
 make_EHelper(xor) {
+	/*
+	rtl_sext(&id_src->val, &id_src->val, id_src->width);
+	id_src->width = id_dest->width;
 	rtl_xor(&id_dest->val, &id_dest->val, &id_src->val);
 	operand_write(id_dest, &id_dest->val);
 	_eflags(&id_dest->val, id_dest->width);
   print_asm_template2(xor);
+	*/
+	procedure(xor)
 }
 
 make_EHelper(or) {
+	/*
+	rtl_sext(&id_src->val, &id_src->val, id_src->width);
+	id_src->width = id_dest->width;
 	rtl_or(&id_dest->val, &id_dest->val, &id_src->val);
 	operand_write(id_dest, &id_dest->val);
 	_eflags(&id_dest->val, id_dest->width);
   print_asm_template2(or);
+	*/
+	procedure(or)
 }
 
 make_EHelper(sar) {
@@ -61,7 +78,9 @@ make_EHelper(shl) {
 }
 
 make_EHelper(shr) {
-  TODO();
+	rtl_shr(&id_dest->val,  &id_dest->val, &id_src->val);
+	operand_write(id_dest, &id_dest->val);
+	rtl_update_ZFSF(&id_dest->val, id_dest->width);
   // unnecessary to update CF and OF in NEMU
 
   print_asm_template2(shr);
@@ -81,3 +100,4 @@ make_EHelper(not) {
 
   print_asm_template1(not);
 }
+#undef procedure
