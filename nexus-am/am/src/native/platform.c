@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <klib.h>
+#include <stdio.h>
+#include <errno.h>
 
 #define PMEM_SHM_FILE "/native-pmem"
 #define PMEM_SIZE (128 * 1024 * 1024) // 128MB
@@ -23,6 +25,8 @@ static void init_platform() {
 
   void *ret = mmap((void *)PMEM_MAP_START, PMEM_MAP_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC,
       MAP_SHARED | MAP_FIXED, pmem_fd, PMEM_MAP_START);
+	if (ret == (void*)-1)
+		perror("err:");
   assert(ret != (void *)-1);
 
   _heap.start = (void *)(PMEM_MAP_START + 4096);  // this is to skip the trap entry
