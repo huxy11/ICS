@@ -54,6 +54,11 @@ void reg_test() {
 	assert(cpu._NT == (eflags_sample & 1 << 14) >> 14); 
 	assert(cpu._RF == (eflags_sample & 1 << 16) >> 16); 
 	assert(cpu._VM == (eflags_sample & 1 << 17) >> 17); 
+
+	cpu.eflags = 0x7fff;
+  for (i = R_EAX; i <= R_EDI; i ++) 
+		cpu.gpr[i]._32 = 0;
+
 	
 	Log("Reg test completed.");
 }
