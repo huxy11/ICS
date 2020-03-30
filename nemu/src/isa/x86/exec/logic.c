@@ -85,6 +85,34 @@ make_EHelper(shr) {
 
   print_asm_template2(shr);
 }
+make_EHelper(rol) {
+	rtl_li(&ir, 1);
+	rtl_mv(&t0, &id_dest->val);
+	union t{
+		rtlreg_t val;
+		struct {
+			rtlreg_t :7;
+			rtlreg_t _b:1;
+			rtlreg_t :7;
+			rtlreg_t _w:1;
+			rtlreg_t :15;
+			rtlreg_t _l:1;
+		};
+	}tmp;
+	while (id_src->val--) {
+		rtl_mv(&tmp.val, &t0);
+		rtl_shl(&t0, &t0, &ir);
+		switch (id_dest->width) {
+			case 1: tmp.val = tmp._b;break;
+			case 2: tmp.val = tmp._w;break;
+			case 4: tmp.val = tmp._l;break;
+			default: assert(0);
+		}
+		rtl_add(&t0, &t0, &tmp.val);
+	}
+	operand_write(id_dest, &t0);
+	print_asm_template2(rol);
+}
 
 make_EHelper(setcc) {
   uint32_t cc = decinfo.opcode & 0xf;

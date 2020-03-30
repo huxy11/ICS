@@ -37,6 +37,7 @@ void device_update() {
 
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
+		Log("SDL_PollEvent!");
     switch (event.type) {
       case SDL_QUIT: {
                        void monitor_statistic();

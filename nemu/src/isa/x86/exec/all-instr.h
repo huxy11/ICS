@@ -21,6 +21,7 @@ make_EHelper(mul);
 make_EHelper(imul1);
 make_EHelper(imul2);
 make_EHelper(imul3);
+make_EHelper(div);
 make_EHelper(idiv);
 make_EHelper(neg);
 //control.c
@@ -36,12 +37,16 @@ make_EHelper(and);
 make_EHelper(xor);
 make_EHelper(or);
 make_EHelper(sar);
+make_EHelper(rol);
 make_EHelper(shl);
 make_EHelper(shr);
 make_EHelper(setcc);
 make_EHelper(test);
 //special.c
 make_EHelper(nop);
+//system.c
+make_EHelper(in);
+make_EHelper(out);
 
 
 make_EHelper(operand_size);

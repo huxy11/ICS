@@ -46,6 +46,7 @@ typedef union  {
 				uint32_t _VM:1;
 			};
 		};
+		uint32_t cs;
 	};
 	uint32_t array[77];
 } CPU_state;

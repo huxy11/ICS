@@ -14,5 +14,6 @@ void rtc_test() {
       printf("%d seconds).\n", sec);
     }
     sec ++;
+		printf("uptime = %d\n", uptime());
   }
 }
