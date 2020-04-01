@@ -23,6 +23,55 @@ static char* _itox(unsigned in) {
 	return &_re[i];
 }
 
+int sprintf(char *out, const char *fmt, ...) {
+	va_list ap;
+	char c;
+	int d;
+	unsigned u;
+	const char* base = out;
+	char* s;
+	va_start(ap, fmt);
+	while (*fmt) {
+		assert(out - base <0xffff); //in case the string is too long
+		if (*fmt == '%') {
+			switch(*++fmt) {
+				case 'c': c = va_arg(ap, int);
+									*out++ = c;
+									break;
+				case 's': s = va_arg(ap, char *);
+									while(*s)
+										*out++ = *s++;
+									break;
+				case 'd':	d = va_arg(ap, int);
+									if (d < 0) {  //negative
+										*out++ = '-';
+										d = -d;
+									}
+									s = _itoa(d);
+									while(*s)
+										*out++ = *s++;
+									break;
+				case '#': assert(*++fmt == 'x');
+									*out++ = '0';
+									*out++ = 'x';
+				case 'p':
+				case 'x':	u = va_arg(ap, unsigned);
+									s = _itox(u);
+									while (*s)
+										*out++ = *s++;
+									break;
+				default:
+									printf("\n%c to be implemented!\n", *fmt);
+									assert(0);
+			}
+		} else {
+			*out++ = *fmt;
+		}
+		fmt++;
+	}
+	*out = 0;
+  return out - base - 1;
+}
 int printf(const char *fmt, ...) {
 	va_list ap;
 	char c;
@@ -76,47 +125,12 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   return 0;
 }
 
+/*
 int sprintf(char *out, const char *fmt, ...) {
-	va_list ap;
-	int d;
-	const char* base = fmt;
-	//char ds[sizeof(int) * 8];
-	char* s;
-	va_start(ap, fmt);
-	while (*fmt) {
-		assert(fmt - base <0xffff);
-		if (*fmt == '%') {
-			switch(*++fmt) {
-				case 's': s = va_arg(ap, char *);
-									while(*s)
-										*out++ = *s++;
-									break;
-				case 'd':	d = va_arg(ap, int);
-									if (d < 0) {
-										_putc('-');
-										d = -d;
-									}
-									s = _itoa(d);
-									while(*s)
-										_putc(*s++);
-									break;
-									/*
-				case 'd':	d = va_arg(ap, int);
-									itoa(d, ds);
-									d = 0;
-									while(ds[d])
-										*out++ = ds[d++];
-									break;
-									*/
-			}
-			fmt++;
-		} else {
-			*out++ = *fmt++;
-		}
-	}
-	*out = 0;
-	return fmt - base + 1;
+	int re =  str_process(out, fmt, ...);
+	return re;
 }
+*/
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
   return 0;

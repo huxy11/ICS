@@ -4,7 +4,9 @@ make_EHelper(mov);
 make_EHelper(movzx);
 make_EHelper(movsx);
 make_EHelper(push);
+make_EHelper(pusha);
 make_EHelper(pop);
+make_EHelper(popa);
 make_EHelper(lea);
 make_EHelper(xchg);
 make_EHelper(leave);
@@ -47,6 +49,9 @@ make_EHelper(nop);
 //system.c
 make_EHelper(in);
 make_EHelper(out);
+make_EHelper(lidt);
+make_EHelper(int);
+make_EHelper(iret);
 
 
 make_EHelper(operand_size);

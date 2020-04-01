@@ -66,8 +66,8 @@ static int cmd_x(char *args) {
 				uint64_t addr = atox(arg);
 				int i = 0;
 				for (i = 0; i < n; ++i) {
-					printf("0x%lX:%02x%c", (addr+i),vaddr_read(addr+i, 1), \
-							((i+1) % 8 == 0 || i == n -1) ? '\n' : ' ');	
+					printf("0x%lX:%02x(%c)%c", (addr+i),vaddr_read(addr+i, 1), \
+							vaddr_read(addr+i, 1), ((i+1) % 8 == 0 || i == n -1) ? '\n' : ' ');	
 				}
 				return 0;
 			}
@@ -132,6 +132,32 @@ static int cmd_dwp(char* args) {
 	}
 	return 0;
 }
+static int cmd_sf(char* args) {
+	uint64_t s[255] = {0, };
+	int cnt = 0;
+	uint64_t* p = s;
+	rtlreg_t bp = cpu.ebp, sp = cpu.esp;
+	if (sp == 0) {
+		Log("No valid stack generated!");
+		return 0;
+	}
+	Log("sf starts at bp = %#x, sp = %#x", bp, sp);
+	while(bp) {
+		*++p = vaddr_read((vaddr_t)sp, 4);
+		if (sp == bp) {
+			*++p = 0xFFFF000000000000 | sp;
+			bp = vaddr_read((vaddr_t)sp, 4);
+			cnt++;
+		}
+		sp += 4;
+		cnt++;
+		if (cnt > 254)
+			break;
+	}
+	while (p > (uint64_t*)s)
+		printf("%#lx\n", *p--);
+	return 0;
+}
 static int cmd_test(char *args) {
 	char *arg = strtok(NULL, " ");
 	int32_t i;
@@ -180,6 +206,7 @@ static struct {
 	{ "expr", "Calculate expression", cmd_expr},
 	{ "wp", "Set a watch point", cmd_wp},
 	{ "dwp", "Remove a watch point", cmd_dwp},
+	{ "sf", "Print stack frame", cmd_sf},
 	{ "test", "Test only", cmd_test},
   { "q", "Exit NEMU", cmd_q },
 
