@@ -56,6 +56,7 @@ char *strstr(const char *, const char *);
 const char *strchr(const char *s, int c);
 
 // stdlib.h
+void itoa(int in, char* out);
 int atoi(const char* nptr);
 int abs(int x);
 unsigned long time();

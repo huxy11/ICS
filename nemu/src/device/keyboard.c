@@ -37,6 +37,7 @@ static int key_f = 0, key_r = 0;
 #define KEYDOWN_MASK 0x8000
 
 void send_key(uint8_t scancode, bool is_keydown) {
+	Log("send!: scancode = %#0x", scancode);
   if (nemu_state.state == NEMU_RUNNING &&
       keymap[scancode] != _KEY_NONE) {
     uint32_t am_scancode = keymap[scancode] | (is_keydown ? KEYDOWN_MASK : 0);

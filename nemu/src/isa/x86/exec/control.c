@@ -1,3 +1,5 @@
+
+
 #include "cpu/exec.h"
 #include "cc.h"
 
@@ -25,15 +27,15 @@ make_EHelper(jmp_rm) {
 }
 
 make_EHelper(call) {
-  // the target address is calculated at the decode stage
-  TODO();
-
+  Assert(id_dest->width == 4, "width is not 4!");
+  rtl_push(&decinfo.seq_pc);
+  rtl_j(decinfo.jmp_pc);
   print_asm("call %x", decinfo.jmp_pc);
 }
 
 make_EHelper(ret) {
-  TODO();
-
+	rtl_pop(&s0);
+	rtl_j(s0);
   print_asm("ret");
 }
 
@@ -44,7 +46,8 @@ make_EHelper(ret_imm) {
 }
 
 make_EHelper(call_rm) {
-  TODO();
+  rtl_push(&decinfo.seq_pc);
+	rtl_jr(&id_dest->val);
 
   print_asm("call *%s", id_dest->str);
 }

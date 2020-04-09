@@ -53,6 +53,11 @@ make_DHelper(SI);
 make_DHelper(G2E);
 make_DHelper(E2G);
 
+make_DHelper(mov_1bE2G);
+make_DHelper(mov_2bE2G);
+make_DHelper(SI2A);
+make_DHelper(SIb2E);
+
 make_DHelper(mov_I2r);
 make_DHelper(mov_I2E);
 make_DHelper(mov_G2E);
