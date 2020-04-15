@@ -37,7 +37,6 @@ make_EHelper(iret) {
 	rtl_pop(&cpu.eflags);
 
 	rtl_j(s0);
-	Log("s0 = %#x", s0);
   print_asm("iret");
 }
 

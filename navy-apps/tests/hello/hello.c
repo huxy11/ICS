@@ -2,7 +2,9 @@
 #include <stdio.h>
 
 int main() {
-  write(1, "Hello World!\n", 13);
+	int re = 0;
+  re = write(1, "Hello World!\n", 13);
+	printf("re = %d\n", re);
   int i = 2;
   volatile int j = 0;
   while (1) {

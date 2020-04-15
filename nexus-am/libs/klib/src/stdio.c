@@ -61,7 +61,7 @@ int sprintf(char *out, const char *fmt, ...) {
 										*out++ = *s++;
 									break;
 				default:
-									printf("\n%c to be implemented!\n", *fmt);
+									printf("\ntoken:%c to be implemented!\n", *fmt);
 									assert(0);
 			}
 		} else {
@@ -110,7 +110,7 @@ int printf(const char *fmt, ...) {
 										_putc(*s++);
 									break;
 				default:
-									printf("\n%c to be implemented!\n", *fmt);
+									printf("\ntoken:%c to be implemented!\n", *fmt);
 									assert(0);
 			}
 			fmt++;
