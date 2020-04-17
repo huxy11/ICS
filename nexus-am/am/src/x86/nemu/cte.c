@@ -1,5 +1,6 @@
 #include <am.h>
 #include <x86.h>
+#include <klib.h>
 
 static _Context* (*user_handler)(_Event, _Context*) = NULL;
 
@@ -10,9 +11,12 @@ void __am_vecnull();
 
 _Context* __am_irq_handle(_Context *c) {
   _Context *next = c;
+	assert(c->as == 0);
   if (user_handler) {
     _Event ev = {0};
     switch (c->irq) {
+			case 0x81:ev.event = _EVENT_YIELD; break;
+			case 0x80:ev.event = _EVENT_SYSCALL; break;
       default: ev.event = _EVENT_ERROR; break;
     }
 

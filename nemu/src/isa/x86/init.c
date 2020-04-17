@@ -9,12 +9,15 @@ const uint8_t isa_default_img []  = {
   0x66, 0xc7, 0x84, 0x99, 0x00, 0xe0,  // 100017:  movw  $0x1,-0x2000(%ecx,%ebx,4)
   0xff, 0xff, 0x01, 0x00,
   0xb8, 0x00, 0x00, 0x00, 0x00,        // 100021:  movl  $0x0,%eax
+	0x60,
   0xd6,                                // 100026:  nemu_trap
 };
 const long isa_default_img_size = sizeof(isa_default_img);
 
 static void restart() {
   /* Set the initial program counter. */
+	cpu.cs = 0x8;
+	cpu.eflags = 0x2;
   cpu.pc = PC_START;
 }
 

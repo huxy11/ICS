@@ -1,13 +1,17 @@
 #include <am.h>
 #include <amdev.h>
 #include <nemu.h>
+#include <klib.h>
+_DEV_TIMER_UPTIME_t uptime_base;
 
 size_t __am_timer_read(uintptr_t reg, void *buf, size_t size) {
   switch (reg) {
     case _DEVREG_TIMER_UPTIME: {
       _DEV_TIMER_UPTIME_t *uptime = (_DEV_TIMER_UPTIME_t *)buf;
       uptime->hi = 0;
-      uptime->lo = 0;
+			uint32_t tmp = inl(RTC_ADDR);
+			assert(tmp >= uptime_base.lo);
+      uptime->lo = tmp - uptime_base.lo;
       return sizeof(_DEV_TIMER_UPTIME_t);
     }
     case _DEVREG_TIMER_DATE: {
@@ -25,4 +29,8 @@ size_t __am_timer_read(uintptr_t reg, void *buf, size_t size) {
 }
 
 void __am_timer_init() {
+	uptime_base.hi = 0;
+	uptime_base.lo = inl(RTC_ADDR);
 }
+
+

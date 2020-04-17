@@ -1,6 +1,7 @@
 #include "hal.h"
 
 int SDL_PollEvent(SDL_Event *event) {
+	assert(0);
 	return 0;
 }
 

@@ -39,3 +39,23 @@ void paddr_write(paddr_t addr, uint32_t data, int len) {
     return map_write(addr, data, len, fetch_mmio_map(addr));
   }
 }
+
+uint64_t atox(const char *s){
+	int len = strlen(s);
+	int64_t i;
+	uint64_t re = 0;
+	for (i = 0;  i < len; ++i) {
+		if (s[i] <= '9' && s[i] >= '0'){
+			re *= 16;
+			re += (s[i] & 0xF);
+		} else if ((s[i] <='z' && s[i] >='a') || (s[i] <= 'Z' && s[i] >='A')){
+			re *= 16;
+			re += ((s[i] & 0xF) + 9);
+		} else{
+			printf("%c is invalid, returning zero.\n", s[i]); 
+			return 0;
+		}
+	}	
+	return re;
+
+}

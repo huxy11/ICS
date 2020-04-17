@@ -59,11 +59,21 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int _write(int fd, void *buf, size_t count) {
-  _exit(SYS_write);
-  return 0;
+	int ret = _syscall_(SYS_write, fd, (intptr_t)buf, count);
+	return ret;
 }
 
 void *_sbrk(intptr_t increment) {
+	extern  int end;
+	static intptr_t pb = 0;
+	if (!pb)
+		pb = end;
+	intptr_t addr = pb + increment; 
+	int re = _syscall_(SYS_brk, addr, 0, 0);
+	if (!re) {
+		pb = addr;	
+		return (void *)pb - increment;
+	}
   return (void *)-1;
 }
 

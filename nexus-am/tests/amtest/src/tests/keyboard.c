@@ -11,7 +11,8 @@ const char *names[256] = {
 
 void keyboard_test() {
   printf("Try to press any key...\n");
-  while (1) {
+	uint64_t i=  0;
+  while (i++ < 0xFFFF) {
     int key = read_key();
     int down = 0;
     if (key & 0x8000) {

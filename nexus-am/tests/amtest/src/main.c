@@ -25,6 +25,7 @@ int main(const char *args) {
     CASE('v', video_test, IOE);
     CASE('p', vm_test, IOE, CTE(vm_handler), VME(simple_pgalloc, simple_pgfree));
     case 'H':
+		printf("assistant info:\n");
     default:
       printf("Usage: make run mainargs=*\n");
       for (int ch = 0; ch < 256; ch++) {

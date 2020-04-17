@@ -1,4 +1,5 @@
 static unsigned long int next = 1;
+#define INT_BYTES (sizeof(int) * 4)
 
 int rand(void) {
   // RAND_MAX assumed to be 32767
