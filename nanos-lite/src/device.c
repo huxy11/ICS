@@ -1,8 +1,13 @@
 #include "common.h"
 #include <amdev.h>
+#include <klib.h>
+#include "fs.h"
 
 size_t serial_write(const void *buf, size_t offset, size_t len) {
-  return 0;
+	int i;
+	for (i = 0; i < len; ++i)
+		_putc(*(char *)(buf + i));
+  return i;
 }
 
 #define NAME(key) \
@@ -14,6 +19,10 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t offset, size_t len) {
+	int ret = read_key();
+	if (ret != _KEY_NONE){
+		Log("%s", keyname[ret&0x7fff ]);
+	}
   return 0;
 }
 
