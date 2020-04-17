@@ -23,7 +23,9 @@ size_t events_read(void *buf, size_t offset, size_t len) {
 	if (ret != _KEY_NONE){
 		Log("%s", keyname[ret&0x7fff ]);
 	}
-  return 0;
+	ret = uptime();
+	sprintf(buf,"t %d\n", ret);
+  return strlen(buf);
 }
 
 static char dispinfo[128] __attribute__((used)) = {};

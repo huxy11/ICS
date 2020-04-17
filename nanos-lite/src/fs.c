@@ -56,6 +56,7 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 size_t fs_read(int fd, void *buf, size_t len) {
 	assert(fd > 2 && fd < NR_FILES);
+	Log("fs_read");
 	Finfo *cur = &file_table[fd];
 	intptr_t sp = cur->disk_offset + cur->open_offset;
 	assert(sp>= cur->disk_offset && sp < cur->disk_offset + cur->size);
