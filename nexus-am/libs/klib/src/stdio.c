@@ -133,7 +133,54 @@ int sprintf(char *out, const char *fmt, ...) {
 */
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
-  return 0;
+	va_list ap;
+	char c;
+	int d;
+	unsigned u;
+	const char* base = out;
+	char* s;
+	va_start(ap, fmt);
+	while (*fmt && (out-base < n) <= n) {
+		assert(out - base <0xffff); //in case the string is too long
+		if (*fmt == '%') {
+			switch(*++fmt) {
+				case 'c': c = va_arg(ap, int);
+									*out++ = c;
+									break;
+				case 's': s = va_arg(ap, char *);
+									while(*s)
+										*out++ = *s++;
+									break;
+				case 'd':	d = va_arg(ap, int);
+									if (d < 0) {  //negative
+										*out++ = '-';
+										d = -d;
+									}
+									s = _itoa(d);
+									while(*s)
+										*out++ = *s++;
+									break;
+				case '#': assert(*++fmt == 'x');
+									*out++ = '0';
+									*out++ = 'x';
+				case 'p':
+				case 'x':	u = va_arg(ap, unsigned);
+									s = _itox(u);
+									while (*s)
+										*out++ = *s++;
+									break;
+				default:
+									printf("\ntoken:%c to be implemented!\n", *fmt);
+									assert(0);
+			}
+		} else {
+			*out++ = *fmt;
+		}
+		fmt++;
+	}
+	if (out - base < n)
+		*out = 0;
+  return out - base - 1;
 }
 
 #endif
