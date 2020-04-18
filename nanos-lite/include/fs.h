@@ -2,7 +2,11 @@
 #define __FS_H__
 
 #include "common.h"
-extern size_t serial_write(const void *, size_t, size_t);
+size_t serial_write(const void *, size_t, size_t);
+size_t fb_write(const void *, size_t, size_t);
+size_t dispinfo_read(void *, size_t, size_t);
+size_t fbsync_write(const void *, size_t, size_t);
+size_t screen_size(void);
 
 int fs_open(const char *, int, int);
 size_t fs_read(int, void *, size_t);
@@ -25,19 +29,6 @@ typedef struct {
 		ReadFn read;
 		WriteFn write;
 } Finfo;
-
-/* This is the information about all files in disk. */
-static Finfo file_table[] __attribute__((used)) = {
-  {"stdin", 0, 0, 0, invalid_read, invalid_write},
-  {"stdout", 0, 0, 0, invalid_read, serial_write},
-  {"stderr", 0, 0, 0, invalid_read, invalid_write},
-  {"/dev/events", 0, 0, 0, events_read, invalid_write},
-	{"/dev/fb", 0, 0, 0,fb_read, fb_write},
-	{"/dev/fbsync", 0, 0, 0, invalod_read, fbsync_write},
-	{"/proc/dispinfo", 0 ,0, 0, dispinfo_read, invalid_write},
-#include "files.h"
-};
-
 
 
 #ifndef SEEK_SET

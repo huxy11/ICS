@@ -22,7 +22,9 @@ int main() {
   while (1) {
     current = uptime();
     if (current - last > 5000) {
+		
       // change image every 5s
+			printf("i = %d\n", i);
       i = (i + 1) % NR_IMG;
       display_image(i);
       last = current;

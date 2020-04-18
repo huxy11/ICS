@@ -3,6 +3,7 @@
 #include "fs.h"
 #include <klib.h>
 
+extern Finfo file_table[];
 
 _Context* do_syscall(_Context *c) {
   uintptr_t a[4];
@@ -17,13 +18,13 @@ _Context* do_syscall(_Context *c) {
 								return 0;
 		case SYS_read:
 								if (file_table[c->GPR2].read)
-									c->GPRx = file_table[c->GPR2].read((char *)c->GPR3, 0, c->GPR4);
+									c->GPRx = file_table[c->GPR2].read((char *)c->GPR3, file_table[c->GPR2].open_offset, c->GPR4);
 								else
 									c->GPRx = fs_read(c->GPR2, (char *)c->GPR3, c->GPR4);
 								return 0;
 		case SYS_write:
 								if (file_table[c->GPR2].write) {
-									c->GPRx = file_table[c->GPR2].write((const char *)c->GPR3, 0, c->GPR4);
+									c->GPRx = file_table[c->GPR2].write((const char *)c->GPR3, file_table[c->GPR2].open_offset, c->GPR4);
 								} else {
 									c->GPRx = fs_write(c->GPR2, (const char *)c->GPR3, c->GPR4);
 								}
