@@ -19,9 +19,11 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t offset, size_t len) {
-	int ret = read_key();
-	if (ret != _KEY_NONE){
-		Log("%s", keyname[ret&0x7fff ]);
+	int ret;
+	ret = read_key();
+	if ((ret&0x7fff) != _KEY_NONE){
+		sprintf(buf,"k%c %s\n", ret&0x8000 ? 'd' : 'u', keyname[ret&0x7fff]);
+		return strlen(buf);
 	}
 	ret = uptime();
 	sprintf(buf,"t %d\n", ret);
