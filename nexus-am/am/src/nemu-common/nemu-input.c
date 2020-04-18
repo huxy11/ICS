@@ -11,9 +11,8 @@ size_t __am_input_read(uintptr_t reg, void *buf, size_t size) {
       _DEV_INPUT_KBD_t *kbd = (_DEV_INPUT_KBD_t *)buf;
 			uint32_t code = inl(KBD_ADDR);
 			if (code)
-				printf("code = %#x\n", code);
       kbd->keydown = code & KEYDOWN_MASK;
-      kbd->keycode = code ^ KEYDOWN_MASK;
+      kbd->keycode = code & (KEYDOWN_MASK - 1);
       return sizeof(_DEV_INPUT_KBD_t);
     }
   }
