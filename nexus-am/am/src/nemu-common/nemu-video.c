@@ -26,7 +26,7 @@ size_t __am_video_write(uintptr_t reg, void *buf, size_t size) {
 			assert(ctl->x + ctl->w <= w);
 			for (int j = 0; j < ctl->h; ++j)
 				for (int i = 0; i < ctl->w; ++i){
-					vm[w*(ctl->y + j) + (ctl->x + i)] = *ctl->pixels;
+					vm[w*(ctl->y + j) + (ctl->x + i)] = ctl->pixels[ctl->w * j + i];
 				}
       if (ctl->sync) {
         outl(SYNC_ADDR, 0);
