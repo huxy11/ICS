@@ -26,13 +26,15 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 	fs_lseek(fd, ehdr.e_phoff, 0);
 	fs_read(fd, &phdr, ehdr.e_phnum * ehdr.e_phentsize);
 	/* loading necessary entries */
+	//memset((char *)0x3000000, 0, 0x30000);
 	for (int i = 0; i < ehdr.e_phnum; ++i) {
 		if (phdr[i].p_type == PT_LOAD) {
 			void *p = (void*)(phdr[i].p_paddr);
 			size_t off = phdr[i].p_offset;
 			size_t fsz = phdr[i].p_filesz;
 			size_t msz = phdr[i].p_memsz;
-			memset(p, 0, msz);
+			Log("p = %#x", p);
+			memset(p, 0, msz + 4);
 			fs_lseek(fd, off, 0);
 			fs_read(fd, p, fsz);
 		}

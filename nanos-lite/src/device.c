@@ -36,9 +36,7 @@ static char dispinfo[128] = {};
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 	size_t l = strlen(strncpy(buf, dispinfo+offset, len));
 	assert(l < len);
-	((char*)buf)[l] = '\0';
-	((char*)buf)[l+1] = (-1);
-	return l + 1;
+	return l;
 }
 static int screen_w, screen_h;
 size_t fb_write(const void *buf, size_t offset, size_t len) {
@@ -51,7 +49,6 @@ size_t fb_write(const void *buf, size_t offset, size_t len) {
 }
 
 size_t fbsync_write(const void *buf, size_t offset, size_t len) {
-	Log("sync!");
 	draw_sync();
   return 0;
 }
@@ -60,6 +57,7 @@ void init_device() {
   Log("Initializing devices...");
   _ioe_init();
 	sprintf(dispinfo, "WIDTH:%d\nHEIGHT:%d\0", screen_w = screen_width(), screen_h = screen_height());
+	Log("dispinfo = %s dispinfo'address = %#x", dispinfo, &dispinfo);
   // described in the Navy-apps convention
 }
 size_t screen_size() {
