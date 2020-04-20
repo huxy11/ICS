@@ -33,7 +33,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 			size_t off = phdr[i].p_offset;
 			size_t fsz = phdr[i].p_filesz;
 			size_t msz = phdr[i].p_memsz;
-			Log("p = %#x", p);
 			memset(p, 0, msz + 4);
 			fs_lseek(fd, off, 0);
 			fs_read(fd, p, fsz);
@@ -74,7 +73,7 @@ void context_kload(PCB *pcb, void *entry) {
   _Area stack;
   stack.start = pcb->stack;
   stack.end = stack.start + sizeof(pcb->stack);
-
+	Log("entry address = 0x%x", entry);
   pcb->cp = _kcontext(stack, entry, NULL);
 }
 void context_uload(PCB *pcb, const char *filename) {

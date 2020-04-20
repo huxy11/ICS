@@ -17,15 +17,16 @@ _Context* __am_irq_handle(_Context *c) {
     switch (c->irq) {
 			case 0x81:ev.event = _EVENT_YIELD; break;
 			case 0x80:ev.event = _EVENT_SYSCALL; break;
-      default: ev.event = _EVENT_ERROR; break;
+      default: printf("c->irq = %d\n", c->irq);ev.event = _EVENT_ERROR; break;
     }
 
     next = user_handler(ev, c);
+		next = NULL;
     if (next == NULL) {
       next = c;
     }
   }
-
+	printf("next->ip = 0x%x\taddress = 0x%x\n", next->ip, &next);
   return next;
 }
 
@@ -52,10 +53,16 @@ int _cte_init(_Context*(*handler)(_Event, _Context*)) {
 }
 
 _Context *_kcontext(_Area stack, void (*entry)(void *), void *arg) {
-  return NULL;
+	_Context *c = stack.end - sizeof(_Context) + 4;
+	memset(c, 0, sizeof(_Context));
+	c->ip = (uint32_t) entry;
+	c->cs = 8;
+	c->ebp = (uint32_t)c - 20;
+  return c;
 }
 
 void _yield() {
+	printf("yyyyyyyyyyy\n");
   asm volatile("int $0x81");
 }
 
