@@ -36,11 +36,11 @@ static int cmd_si(char *args) {
 	uint32_t n = 1;
 	if (arg && atoi(arg))
 		n = atoi(arg);
-	/*
-	else 
-		Log("Invalid arg for cmd_si execute once.");
-		*/
 	cpu_exec(n);
+	if (n != 1)
+		printf("execute %d times\n", n);
+	else
+		printf("pc = %#x\n", cpu.pc);
 	return 0;
 }
 static int cmd_i(char* args) {

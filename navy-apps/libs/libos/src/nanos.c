@@ -74,6 +74,7 @@ void *_sbrk(intptr_t increment) {
 		pb = addr;	
 		return (void *)pb - increment;
 	}
+	assert(0);
   return (void *)-1;
 }
 
@@ -90,8 +91,7 @@ off_t _lseek(int fd, off_t offset, int whence) {
 }
 
 int _execve(const char *fname, char * const argv[], char *const envp[]) {
-  _exit(SYS_execve);
-  return 0;
+	return _syscall_(SYS_execve, fname, argv, envp);
 }
 
 // The code below is not used by Nanos-lite.
@@ -102,6 +102,7 @@ int _fstat(int fd, struct stat *buf) {
 }
 
 int _kill(int pid, int sig) {
+	assert(0);
   _exit(-SYS_kill);
   return -1;
 }
