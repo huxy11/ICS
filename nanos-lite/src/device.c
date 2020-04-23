@@ -62,7 +62,6 @@ void init_device() {
   Log("Initializing devices...");
   _ioe_init();
 	sprintf(dispinfo, "WIDTH:%d\nHEIGHT:%d\0", screen_w = screen_width(), screen_h = screen_height());
-	Log("dispinfo = %s dispinfo'address = %#x", dispinfo, &dispinfo);
   // described in the Navy-apps convention
 }
 size_t screen_size() {

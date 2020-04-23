@@ -42,6 +42,8 @@ int _vme_init(void* (*pgalloc_f)(size_t), void (*pgfree_f)(void*)) {
       PTE pte_end = PGADDR(pdir_idx + 1, 0, 0) | PTE_P;
       for (; pte < pte_end; pte += PGSIZE) {
         *ptab = pte;
+				if ((uint32_t)ptab >= 0x231000 && (uint32_t)ptab <= 0x231110)
+					printf("0x%x:0x%x\t", ptab, pte);
         ptab ++;
       }
     }

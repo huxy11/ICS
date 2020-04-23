@@ -13,8 +13,8 @@ _Context* do_syscall(_Context *c) {
   a[0] = c->GPR1;
   switch (a[0]) {
 		case SYS_exit: 
-								naive_uload(NULL, "/bin/init");	
-								//_halt(0);
+								//naive_uload(NULL, "/bin/init");	
+								_halt(0);
 								return 0;
 		case SYS_yield:
 								return schedule(c);

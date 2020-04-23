@@ -261,6 +261,42 @@ make_DHelper(cl_G2E) {
 
   print_Dop(id_src->str, OP_STR_SIZE, "%%cl");
 }
+/*
+ * use for cr0/cr2/cr0
+ */
+make_DHelper(G2CR) {
+	decode_op_rm(pc, id_src, false, id_dest, true);
+	Log("id_src:%d", id_src->reg);
+	Log("id_dest:%d", id_dest->reg);
+	Log("pc = 0x%x", cpu.pc);
+	switch (id_dest->reg) {
+		case 3:
+			id_dest->type = OP_TYPE_CR;
+			strcpy(id_dest->str, "cr3");
+			break;
+		case 0:
+			id_dest->type = OP_TYPE_CR;
+			strcpy(id_dest->str, "cr0");
+			break;
+		default:panic("id_dest->reg = %d", id_dest->reg);
+	}
+}
+make_DHelper(CR2G) {
+	decode_op_rm(pc, id_dest, false, id_src, false);
+	Log("id_src:%d", id_src->reg);
+	Log("id_dest:%d", id_dest->reg);
+	switch (id_src->reg) {
+		case 3:
+			id_src->type = OP_TYPE_CR;
+			strcpy(id_src->str, "cr3");
+			break;
+		case 0:
+			id_src->type = OP_TYPE_CR;
+			strcpy(id_src->str, "cr0");
+			break;
+		default:panic("id_dest->reg = %d", id_dest->reg);
+	}
+}
 
 make_DHelper(O2a) {
   decode_op_O(pc, id_src, true);
@@ -315,7 +351,28 @@ make_DHelper(out_a2dx) {
 }
 
 void operand_write(Operand *op, rtlreg_t* src) {
+	switch (op->type) {
+		case OP_TYPE_REG:
+			rtl_sr(op->reg, src, op->width);break;
+		case OP_TYPE_MEM:
+			rtl_sm(&op->addr, src, op->width);break;
+		case OP_TYPE_CR:
+			switch(op->reg){
+				case 3:
+					cpu.cr3 = *src;
+					break;
+				case 0:
+					cpu.cr0 = *src;
+					break;
+				default: panic("op->reg = %d", op->reg);
+			}
+			break;
+		default:
+			assert(0);
+	}
+	/*
   if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, src, op->width); }
   else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, src, op->width); }
   else { assert(0); }
+	*/
 }

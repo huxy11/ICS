@@ -19,6 +19,8 @@ static void restart() {
 	cpu.cs = 0x8;
 	cpu.eflags = 0x2;
   cpu.pc = PC_START;
+	cpu.cr0 = 0;
+	cpu.cr3 = 0;
 }
 
 void init_isa(void) {

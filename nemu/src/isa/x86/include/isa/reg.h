@@ -23,7 +23,7 @@ typedef union  {
 			rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
 			};
 		};
-		vaddr_t pc;
+		rtlreg_t pc;
 		union{
 			rtlreg_t eflags;
 			struct {
@@ -46,7 +46,9 @@ typedef union  {
 				rtlreg_t _VM:1;
 			};
 		};
-		rtlreg_t cs;
+		rtlreg_t cs, ss, ds, es, fs, gs;
+		rtlreg_t cr0, cr3;
+
 		//hind
 		struct {
 			uint16_t limit;

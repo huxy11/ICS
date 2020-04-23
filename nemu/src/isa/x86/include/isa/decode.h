@@ -71,6 +71,9 @@ make_DHelper(gp2_Ib2E);
 make_DHelper(Ib_G2E);
 make_DHelper(cl_G2E);
 
+make_DHelper(G2CR);
+make_DHelper(CR2G);
+
 make_DHelper(O2a);
 make_DHelper(a2O);
 
