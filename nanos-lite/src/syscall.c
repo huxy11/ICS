@@ -13,10 +13,11 @@ _Context* do_syscall(_Context *c) {
   a[0] = c->GPR1;
   switch (a[0]) {
 		case SYS_exit: 
-								//naive_uload(NULL, "/bin/init");	
-								_halt(0);return 0;
+								naive_uload(NULL, "/bin/init");	
+								//_halt(0);
+								return 0;
 		case SYS_yield:
-								return schedule(current->cp);
+								return schedule(c);
 		case SYS_open:
 								c->GPRx = fs_open((const char *)c->GPR2, 0, 0);
 								return 0;

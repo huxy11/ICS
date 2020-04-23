@@ -21,12 +21,10 @@ _Context* __am_irq_handle(_Context *c) {
     }
 
     next = user_handler(ev, c);
-		next = NULL;
     if (next == NULL) {
       next = c;
     }
   }
-	printf("next->ip = 0x%x\taddress = 0x%x\n", next->ip, &next);
   return next;
 }
 
@@ -53,16 +51,15 @@ int _cte_init(_Context*(*handler)(_Event, _Context*)) {
 }
 
 _Context *_kcontext(_Area stack, void (*entry)(void *), void *arg) {
-	_Context *c = stack.end - sizeof(_Context) + 4;
+	_Context *c = stack.end - sizeof(_Context) - 1;
 	memset(c, 0, sizeof(_Context));
 	c->ip = (uint32_t) entry;
 	c->cs = 8;
-	c->ebp = (uint32_t)c - 20;
+	c->ebp = (uint32_t)stack.end - 1;
   return c;
 }
 
 void _yield() {
-	printf("yyyyyyyyyyy\n");
   asm volatile("int $0x81");
 }
 

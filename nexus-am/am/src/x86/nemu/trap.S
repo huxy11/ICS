@@ -6,22 +6,20 @@
 .globl current
 
 __am_asm_trap:
-  pushal
-
-  pushl $0
-
-  pushl %esp
+  pushal 		#save regs
+	
+  pushl $0 	#AddressSpace as
+	
+#	movl current, %esi
+#	movl %esp, (%esi)
+	
+  pushl %esp	#send in argument _Context*
 
   call __am_irq_handle
-
-  popl %esp
-
-	movl cur_c, %esp
-
-  addl $4, %esp
+	
+	movl %eax, %esp	#return is the new _Context* we are about to use
+  
+	addl $4, %esp	#AddressSpace
   popal
-  addl $4, %esp
-	pushl 0x08(%esp)
-	pushl 0x08(%esp)
-	pushl 0x08(%esp)
+  addl $4, %esp #irq
   iret

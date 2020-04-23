@@ -50,8 +50,9 @@ void* memset(void* v,int c,size_t n) {
 
 void* memcpy(void* out, const void* in, size_t n) {
 	size_t i;
-	for (i = 0; i < n ; ++i)
+	for (i = 0; i < n ; ++i){
 		((uint8_t*)out)[i] = ((uint8_t*)in)[i];
+	}
   return out;
 }
 
