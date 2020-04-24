@@ -21,15 +21,17 @@ void hello_fun(void *arg) {
 
 void init_proc() {
 	context_kload(&pcb[0], (void *)hello_fun);
-	context_uload(&pcb[2], "/bin/hello");
+	context_uload(&pcb[2], "/bin/dummy");
 
   switch_boot_pcb();
 
   Log("Initializing processes...");
 
   // load program
-	current = &pcb[2];
-	naive_uload(NULL, "/bin/hello");
+	current = &pcb[0];
+  Log("Jump to entry = %x", (void *)hello_fun);
+	hello_fun(NULL);
+	//naive_uload(NULL, "/bin/dummy");
 
 }
 
@@ -39,6 +41,7 @@ _Context* schedule(_Context *prev) {
 	assert(prev->cs == 8);
 	/* switch to destination */
 	current = (current == &pcb[0] ? &pcb[2] : &pcb[0]);
-	//current = &pcb[2];
+	//current = &pcb[0];
+	//assert(current->cp->as->ptr);
 	return current->cp;
 }

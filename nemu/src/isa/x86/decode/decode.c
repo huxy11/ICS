@@ -266,9 +266,6 @@ make_DHelper(cl_G2E) {
  */
 make_DHelper(G2CR) {
 	decode_op_rm(pc, id_src, false, id_dest, true);
-	Log("id_src:%d", id_src->reg);
-	Log("id_dest:%d", id_dest->reg);
-	Log("pc = 0x%x", cpu.pc);
 	switch (id_dest->reg) {
 		case 3:
 			id_dest->type = OP_TYPE_CR;
@@ -283,18 +280,18 @@ make_DHelper(G2CR) {
 }
 make_DHelper(CR2G) {
 	decode_op_rm(pc, id_dest, false, id_src, false);
-	Log("id_src:%d", id_src->reg);
-	Log("id_dest:%d", id_dest->reg);
 	switch (id_src->reg) {
 		case 3:
 			id_src->type = OP_TYPE_CR;
+			id_src->val = cpu.cr3;
 			strcpy(id_src->str, "cr3");
 			break;
 		case 0:
 			id_src->type = OP_TYPE_CR;
+			id_src->val = cpu.cr0;
 			strcpy(id_src->str, "cr0");
 			break;
-		default:panic("id_dest->reg = %d", id_dest->reg);
+		default:panic("id_src->reg = %d pc = 0x%x", id_src->reg, cpu.pc);
 	}
 }
 

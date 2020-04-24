@@ -291,10 +291,17 @@ static inline uint32_t get_cr2() {
   asm volatile ("movl %%cr2, %0" : "=r"(val));
   return val;
 }
-
+static inline uint32_t get_cr3() {
+  volatile uint32_t val;
+  asm volatile ("movl %%cr3, %0" : "=r"(val));
+  return val;
+}
 static inline void set_cr3(void *pdir) {
   asm volatile ("movl %0, %%cr3" : : "r"(pdir));
 }
+
+void __am_get_cur_as(_Context *);
+void __am_switch(_Context *);
 
 #endif
 

@@ -11,7 +11,7 @@ void __am_vecnull();
 
 _Context* __am_irq_handle(_Context *c) {
   _Context *next = c;
-	assert(c->as == 0);
+	__am_get_cur_as(c);
   if (user_handler) {
     _Event ev = {0};
     switch (c->irq) {
@@ -25,6 +25,7 @@ _Context* __am_irq_handle(_Context *c) {
       next = c;
     }
   }
+	__am_switch(next);
   return next;
 }
 
@@ -50,12 +51,13 @@ int _cte_init(_Context*(*handler)(_Event, _Context*)) {
   return 0;
 }
 
-_Context *_kcontext(_Area stack, void (*entry)(void *), void *arg) {
+_Context *_kcontext(_AddressSpace *as, _Area stack, void (*entry)(void *), void *arg) {
 	_Context *c = stack.end - sizeof(_Context) - 1;
 	memset(c, 0, sizeof(_Context));
 	c->ip = (uint32_t) entry;
 	c->cs = 8;
 	c->ebp = (uint32_t)stack.end - 1;
+	c->as = as;
   return c;
 }
 

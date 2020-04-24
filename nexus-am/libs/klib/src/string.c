@@ -52,6 +52,8 @@ void* memcpy(void* out, const void* in, size_t n) {
 	size_t i;
 	for (i = 0; i < n ; ++i){
 		((uint8_t*)out)[i] = ((uint8_t*)in)[i];
+		if ((uint32_t)in + i >= 0x40000444)
+			printf("0x%x\t", ((uint8_t*)in)[i]);
 	}
   return out;
 }

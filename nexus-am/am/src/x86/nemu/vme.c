@@ -10,6 +10,8 @@ static PTE kptabs[(PMEM_SIZE + MMIO_SIZE) / PGSIZE] PG_ALIGN = {};
 static void* (*pgalloc_usr)(size_t) = NULL;
 static void (*pgfree_usr)(void*) = NULL;
 static int vme_enable = 0;
+static _AddressSpace *cur_as = NULL;
+static void* kernel_cr3 = 0;
 
 static _Area segments[] = {      // Kernel memory mappings
   {.start = (void*)0,          .end = (void*)PMEM_SIZE},
@@ -42,8 +44,6 @@ int _vme_init(void* (*pgalloc_f)(size_t), void (*pgfree_f)(void*)) {
       PTE pte_end = PGADDR(pdir_idx + 1, 0, 0) | PTE_P;
       for (; pte < pte_end; pte += PGSIZE) {
         *ptab = pte;
-				if ((uint32_t)ptab >= 0x231000 && (uint32_t)ptab <= 0x231110)
-					printf("0x%x:0x%x\t", ptab, pte);
         ptab ++;
       }
     }
@@ -52,7 +52,6 @@ int _vme_init(void* (*pgalloc_f)(size_t), void (*pgfree_f)(void*)) {
   set_cr3(kpdirs);
   set_cr0(get_cr0() | CR0_PG);
   vme_enable = 1;
-
   return 0;
 }
 
@@ -70,27 +69,47 @@ int _protect(_AddressSpace *as) {
 void _unprotect(_AddressSpace *as) {
 }
 
-static _AddressSpace *cur_as = NULL;
 void __am_get_cur_as(_Context *c) {
-  c->as = cur_as;
+	if (cur_as)
+  	c->as = cur_as;
+	else
+		kernel_cr3 = (void*)get_cr3();
 }
 
 void __am_switch(_Context *c) {
   if (vme_enable) {
-    set_cr3(c->as->ptr);
+		if (!c->as)
+			set_cr3(kernel_cr3);
+		else
+    	set_cr3(c->as->ptr);
     cur_as = c->as;
   }
 }
 
 int _map(_AddressSpace *as, void *va, void *pa, int prot) {
+	//assert(OFF(va) == OFF(pa)); 
+	PDE *updir = as->ptr;
+	PTE *uptab;
+	/* Set PDE */
+	if (!(updir[PDX(va)] & PTE_P)) {
+		/* new page table */
+		uptab = (PTE*)(pgalloc_usr(1));
+
+		updir[PDX(va)] = (((uint32_t)uptab & 0xFFFFF000) | PTE_P);
+	}
+	/* Set PTE */
+	uptab = (PTE*)(((uint32_t)updir[PDX(va)]) & 0xFFFFF000);
+	uptab[PTX(va)] = ((uint32_t)pa & 0xFFFFF000) | PTE_P;	
   return 0;
 }
 
 _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, void *args) {
 	_Context *c = (ustack.end - 1) - sizeof(_Context) - 4*sizeof(int);
-	memset(c, 0 ,sizeof(_Context) + 16);
+	//_protect(as);
+	memset(c, 0 ,sizeof(_Context));
 	c->ip = (uint32_t)entry;
 	c->cs = 8;
 	c->esp = (uint32_t)ustack.end - 1 - 4*sizeof(int);
+	c->as = as;
   return c;
 }

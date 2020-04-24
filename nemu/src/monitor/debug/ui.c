@@ -173,6 +173,25 @@ static int cmd_sf(char* args) {
 	}
 	return 0;
 }
+static int cmd_pd(char* args) {
+	if (!cpu.cr0)
+		return printf("page not on");
+	assert(cpu.cr3);
+	int diri = 0, tabi = 0;
+	uint32_t pde, pte;
+	for (diri = 0; diri < 1024; ++diri) {
+		pde = vaddr_read(cpu.cr3 + diri * 4, 4); 
+		if (pde & 1) {
+			printf("0x%x\n", pde);
+			for (tabi = 0; tabi < 2; ++tabi) {
+				pte = vaddr_read((pde & 0xFFFFF000) + tabi * 4, 4);
+				if (pte & 1)
+					printf("\t0x%x:\t0x%x->0x%x\n", pte, (pte & 0xFFFFF000),(pte & 0xFFFFF000)+0xFFF );
+			}
+		}
+	}
+	return 0;
+}
 /*
 static int cmd_sf(char* args) {
 	uint64_t s[255] = {0, };
@@ -256,6 +275,7 @@ static struct {
 	{ "wp", "Set a watch point", cmd_wp},
 	{ "dwp", "Remove a watch point", cmd_dwp},
 	{ "sf", "Print stack frame", cmd_sf},
+	{ "pd", "Print pages", cmd_pd},
 	{ "test", "Test only", cmd_test},
   { "q", "Exit NEMU", cmd_q },
 
