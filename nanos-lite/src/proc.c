@@ -3,7 +3,7 @@
 #define MAX_NR_PROC 4
 
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
-static PCB pcb_boot = {};
+PCB pcb_boot = {};
 PCB *current = NULL;
 
 void switch_boot_pcb() {
@@ -19,18 +19,25 @@ void hello_fun(void *arg) {
   }
 }
 
+static inline uint32_t get_cr3() {
+	volatile uint32_t val;
+	asm volatile ("movl %%cr3, %0" : "=r"(val));
+	return val;
+}
+
 void init_proc() {
-	context_kload(&pcb[0], (void *)hello_fun);
-	context_uload(&pcb[2], "/bin/dummy");
+	context_kload(&pcb_boot, hello_fun);
+	context_uload(&pcb[0], "/bin/init");
+
 
   switch_boot_pcb();
 
   Log("Initializing processes...");
 
   // load program
-	current = &pcb[0];
-  Log("Jump to entry = %x", (void *)hello_fun);
-	hello_fun(NULL);
+	void *entry = (void*)pcb_boot.cp->ip ;
+  Log("Jump to entry = 0x%x", (uint32_t)entry);
+	((void(*)())entry) ();
 	//naive_uload(NULL, "/bin/dummy");
 
 }
@@ -40,8 +47,7 @@ _Context* schedule(_Context *prev) {
 	current->cp = prev;
 	assert(prev->cs == 8);
 	/* switch to destination */
-	current = (current == &pcb[0] ? &pcb[2] : &pcb[0]);
+	current = (current == &pcb_boot ? &pcb[0] : &pcb_boot);
 	//current = &pcb[0];
-	//assert(current->cp->as->ptr);
 	return current->cp;
 }

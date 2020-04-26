@@ -13,8 +13,9 @@ _Context* do_syscall(_Context *c) {
   a[0] = c->GPR1;
   switch (a[0]) {
 		case SYS_exit: 
-								//naive_uload(NULL, "/bin/init");	
-								_halt(0);
+								assert(c->as && c->as->ptr);
+								naive_uload(c->as, "/bin/init");	
+								//_halt(0);
 								return 0;
 		case SYS_yield:
 								return schedule(c);
@@ -60,8 +61,14 @@ _Context* do_syscall(_Context *c) {
 								/* TODO: implementation */
 								return 0;
 		case SYS_execve:
-								Log("name = %s", (char *)c->GPR2);
-								naive_uload(NULL, (const char *)c->GPR2);
+								Log("SysCall:execve -> name = %s", (char *)c->GPR2);
+								Log("c->as = 0x%x\tc->as->ptr = 0x%x", c->as, c->as->ptr);
+								assert(c->as && c->as->ptr);
+								assert(c->as);
+								
+								naive_uload(c->as, (const char *)c->GPR2);
+								
+								/* return means something wrong*/
 								c->GPRx = -1;
 								return 0;
 

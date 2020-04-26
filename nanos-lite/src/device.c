@@ -4,7 +4,7 @@
 #include "fs.h"
 
 size_t serial_write(const void *buf, size_t offset, size_t len) {
-	//_yield();
+	_yield();
 	int i;
 	for (i = 0;i < len; ++i){
 		char c = *((char*)buf + i);
@@ -23,7 +23,7 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t offset, size_t len) {
-	//_yield();
+	_yield();
 	int ret;
 	ret = read_key();
 	if ((ret&0x7fff) != _KEY_NONE){
@@ -44,7 +44,7 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 }
 static int screen_w, screen_h;
 size_t fb_write(const void *buf, size_t offset, size_t len) {
-	//_yield();
+	_yield();
 	intptr_t p = (intptr_t)buf;
 	uint32_t *pixels = (uint32_t *)p;
 	int x = offset / 4 % screen_w;

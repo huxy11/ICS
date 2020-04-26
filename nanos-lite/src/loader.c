@@ -12,7 +12,9 @@
 # define Elf_Phdr Elf32_Phdr
 #endif
 
-static uintptr_t loader(PCB *pcb, const char *filename) {
+static uintptr_t loader(_AddressSpace *as, const char *filename) {
+	assert(as);
+	printf("as->ptr = 0x%x\n", (uint32_t)as->ptr);
 	Elf_Ehdr ehdr;
 	Elf_Phdr phdr[64];
 	int fd = fs_open(filename, 0, 0);
@@ -34,12 +36,12 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 			size_t off = phdr[i].p_offset;
 			size_t fsz = phdr[i].p_filesz;
 			size_t msz = phdr[i].p_memsz;
-			/* */
 			void *p = (void*)(phdr[i].p_paddr);
+			/* number of needed pages*/
 			int pcnt = phdr[i].p_memsz/PGSIZE + (phdr[i].p_memsz%PGSIZE ? 1 : 0);
 			void *physic_pg = new_page(pcnt);	
 			for (int i = 0; i < pcnt; ++i)
-				_map(&(pcb->as), p + i*PGSIZE, physic_pg + i*PGSIZE, 0);
+				_map(as, p + i * PGSIZE, physic_pg + i * PGSIZE, 0);
 			memset(physic_pg + ((uint32_t)p & 0xFFF), 0, msz + 4);
 			fs_lseek(fd, off, 0);
 			fs_read(fd, physic_pg + ((uint32_t)p & 0xFFF), fsz);
@@ -48,8 +50,9 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 	return ehdr.e_entry;
 }
 
-void naive_uload(PCB *pcb, const char *filename) {
-  uintptr_t entry = loader(pcb, filename);
+void naive_uload(_AddressSpace *as, const char *filename) {
+	assert(as);
+  uintptr_t entry = loader(as, filename);
   Log("Jump to entry = %x", entry);
   ((void(*)())entry) ();
 }
@@ -60,16 +63,15 @@ static inline uint32_t get_cr3() {
 	return val;
 }
 void context_kload(PCB *pcb, void *entry) {
-	pcb->as.ptr = (void*)get_cr3();
-	Log("get_cr3 = 0x%x val = 0x%x", pcb->as.ptr, *((uint32_t*)pcb->as.ptr));
   _Area stack;
   stack.start = pcb->stack;
   stack.end = stack.start + sizeof(pcb->stack);
-  pcb->cp = _kcontext(&pcb->as, stack, entry, NULL);
+  pcb->cp = _kcontext(stack, entry, NULL);
 }
 void context_uload(PCB *pcb, const char *filename) {
-	_protect(&(pcb->as));
-  uintptr_t entry = loader(pcb, filename);
+	if(!(pcb->as.ptr))
+		_protect(&(pcb->as));
+  uintptr_t entry = loader(&pcb->as, filename);
 
   _Area stack;
   stack.start = pcb->stack;
