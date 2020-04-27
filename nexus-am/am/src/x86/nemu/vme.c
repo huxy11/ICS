@@ -4,6 +4,8 @@
 #include <klib.h>
 
 #define PG_ALIGN __attribute((aligned(PGSIZE)))
+#define EFLAGS_IF (1 << 9)
+#define EFLAGS_DEFAULT (1 << 1)
 
 static PDE kpdirs[NR_PDE] PG_ALIGN = {};
 static PTE kptabs[(PMEM_SIZE + MMIO_SIZE) / PGSIZE] PG_ALIGN = {};
@@ -111,6 +113,8 @@ _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, 
 	memset(c, 0 ,sizeof(_Context));
 	c->ip = (uint32_t)entry;
 	c->cs = 8;
+	/* set IF*/
+	c->eflags = EFLAGS_DEFAULT | EFLAGS_IF;
 	c->esp = (uint32_t)ustack.end - 1 - 4*sizeof(int);
 	c->as = as;
   return c;

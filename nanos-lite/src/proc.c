@@ -27,7 +27,8 @@ static inline uint32_t get_cr3() {
 
 void init_proc() {
 	context_kload(&pcb_boot, hello_fun);
-	context_uload(&pcb[0], "/bin/init");
+	context_uload(&pcb[0], "/bin/dummy");
+	context_uload(&pcb[1], "/bin/hello");
 
 
   switch_boot_pcb();
@@ -47,7 +48,7 @@ _Context* schedule(_Context *prev) {
 	current->cp = prev;
 	assert(prev->cs == 8);
 	/* switch to destination */
-	current = (current == &pcb_boot ? &pcb[0] : &pcb_boot);
+	current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
 	//current = &pcb[0];
 	return current->cp;
 }

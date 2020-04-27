@@ -2,6 +2,8 @@
 #define __X86_REG_H__
 
 #include "common.h"
+#define EFLAGS_IF (1 << 9)
+#define EFlAGS_DEFAULT (1 << 1)
 
 #define PC_START IMAGE_START
 
@@ -48,6 +50,7 @@ typedef union  {
 		};
 		rtlreg_t cs, ss, ds, es, fs, gs;
 		rtlreg_t cr0, cr3;
+		bool INTR;
 
 		//hind
 		struct {

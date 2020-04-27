@@ -161,7 +161,8 @@ static inline void rtl_mux(rtlreg_t* dest, const rtlreg_t* cond, const rtlreg_t*
   TODO();
 }
 
-void raise_intr(uint32_t, vaddr_t);
+void raise_intr(uint32_t, const vaddr_t);
+bool isa_query_intr(const vaddr_t);
 
 #include "isa/rtl.h"
 
