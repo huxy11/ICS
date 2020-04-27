@@ -11,7 +11,6 @@ static void* (*pgalloc_usr)(size_t) = NULL;
 static void (*pgfree_usr)(void*) = NULL;
 static int vme_enable = 0;
 static _AddressSpace *cur_as = NULL;
-static void* kernel_cr3 = 0;
 
 static _Area segments[] = {      // Kernel memory mappings
   {.start = (void*)0,          .end = (void*)PMEM_SIZE},
@@ -56,6 +55,7 @@ int _vme_init(void* (*pgalloc_f)(size_t), void (*pgfree_f)(void*)) {
 }
 
 int _protect(_AddressSpace *as) {
+	assert(!(as->ptr));
   PDE *updir = (PDE*)(pgalloc_usr(1));
   as->ptr = updir;
   // map kernel space
@@ -70,35 +70,37 @@ void _unprotect(_AddressSpace *as) {
 }
 
 void __am_get_cur_as(_Context *c) {
-	if (cur_as)
-  	c->as = cur_as;
-	else
-		kernel_cr3 = (void*)get_cr3();
+	if (!cur_as) {
+		cur_as = (void*)0x209004;
+		cur_as->ptr = (void*)get_cr3();
+	}
+  c->as = cur_as;
 }
 
 void __am_switch(_Context *c) {
   if (vme_enable) {
-		if (!c->as)
-			set_cr3(kernel_cr3);
-		else
-    	set_cr3(c->as->ptr);
+    set_cr3(c->as->ptr);
     cur_as = c->as;
   }
 }
 
 int _map(_AddressSpace *as, void *va, void *pa, int prot) {
 	//assert(OFF(va) == OFF(pa)); 
+	assert(as && as->ptr);
 	PDE *updir = as->ptr;
 	PTE *uptab;
 	/* Set PDE */
 	if (!(updir[PDX(va)] & PTE_P)) {
 		/* new page table */
 		uptab = (PTE*)(pgalloc_usr(1));
-
 		updir[PDX(va)] = (((uint32_t)uptab & 0xFFFFF000) | PTE_P);
 	}
 	/* Set PTE */
 	uptab = (PTE*)(((uint32_t)updir[PDX(va)]) & 0xFFFFF000);
+
+	assert((!(uptab[PTX(va)] & PTE_P) || \
+				((uptab[PTX(va)] & 0xFFFFF000) == ((uint32_t)pa & 0xFFFFF000)) ));
+
 	uptab[PTX(va)] = ((uint32_t)pa & 0xFFFFF000) | PTE_P;	
   return 0;
 }

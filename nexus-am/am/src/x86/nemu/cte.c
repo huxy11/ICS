@@ -51,13 +51,12 @@ int _cte_init(_Context*(*handler)(_Event, _Context*)) {
   return 0;
 }
 
-_Context *_kcontext(_AddressSpace *as, _Area stack, void (*entry)(void *), void *arg) {
+_Context *_kcontext(_Area stack, void (*entry)(void *), void *arg) {
 	_Context *c = stack.end - sizeof(_Context) - 1;
 	memset(c, 0, sizeof(_Context));
 	c->ip = (uint32_t) entry;
 	c->cs = 8;
 	c->ebp = (uint32_t)stack.end - 1;
-	c->as = as;
   return c;
 }
 
