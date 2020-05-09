@@ -1,17 +1,38 @@
-# ICS2019 Programming Assignment
+# ICS-emulator
 
-This project is the programming assignment of the class ICS(Introduction to Computer System) in Department of Computer Science and Technology, Nanjing University.
+- ## Background
 
-For the guide of this programming assignment,
-refer to http://nju-ics.gitbooks.io/ics2019-programming-assignment/content/
+  This project is derived from <u>NJU's programming assignment</u>. In which I implemented a simple but complete x86-arch emulator and a micro system,  aimming at getting fully understanding about the subtle details with computer systems in a programmer's perspective.
 
-To initialize, run
-```bash
-bash init.sh
-```
+- ## Introduction
 
-The following subprojects/components are included. Some of them are not fully implemented.
-* [NEMU](https://github.com/NJU-ProjectN/nemu)
-* [Nexus-am](https://github.com/NJU-ProjectN/nexus-am)
-* [Nanos-lite](https://github.com/NJU-ProjectN/nanos-lite)
-* [Navy-apps](https://github.com/NJU-ProjectN/navy-apps)
+- ### Overall Architect
+
+  - | Overall Architect |                                 |
+    | ----------------- | :-----------------------------: |
+    | navy-apps         |          applications           |
+    | nanos-lite        |     micro operation system      |
+    | nexus-am          |        abstract machine         |
+    | nemu              | x86-arch machine implementation |
+    | init.sh           |          Set env args           |
+
+- ### NEMU
+
+  Nemu is a implementation of actual x86 computer.
+
+  TBW...
+
+- NEXUS-AM
+
+- NANOS-LITE
+
+- NAVY-APPS
+
+- ## Install
+
+- ```bash
+  bash init.sh
+  source ~/.bashrc
+  ```
+
+  
