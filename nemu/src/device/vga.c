@@ -29,6 +29,13 @@ static inline void update_screen() {
 }
 
 static void vga_io_handler(uint32_t offset, int len, bool is_write) {
+	/*
+	SDL_Rect rect = {50, 50, 100, 200};
+	SDL_RenderDrawRect(renderer, &rect);
+	SDL_SetRenderDrawColor(renderer, 0, 128, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderFillRect(renderer, &rect);
+	SDL_RenderPresent(renderer);
+	*/
 	update_screen();
 }
 

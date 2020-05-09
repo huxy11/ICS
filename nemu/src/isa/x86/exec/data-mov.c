@@ -1,4 +1,12 @@
 #include "cpu/exec.h"
+#define PUSHA(x)	\
+	rtl_mv(&t0, concat((rtlreg_t*)&reg_, x)(R_ESP ));	\
+	for (int i = R_EAX; i <= R_EDI; ++i)	\
+			i != R_ESP ? rtl_push(concat((rtlreg_t*)&reg_, x)(i)) : rtl_push(&t0)
+#define POPA(x)	\
+	for (int i = R_EDI; i >= R_EAX; --i) \
+			i != R_ESP ? rtl_pop(concat((rtlreg_t*)&reg_, x)(i)) : rtl_pop(&ir)
+	
 
 make_EHelper(mov) {
   operand_write(id_dest, &id_src->val);
@@ -17,13 +25,27 @@ make_EHelper(pop) {
 }
 
 make_EHelper(pusha) {
-  TODO();
-
+	if (decinfo.isa.is_operand_size_16) {
+		PUSHA(w);
+	} else {
+		PUSHA(l);
+		/*
+		rtl_lr(&t0, R_ESP, 4);
+		for(int i = R_EAX; i <= R_EDI; ++i){
+			i != R_ESP ? rtl_push(&(reg_l(i))) : rtl_push(&t0);
+			Log("%s : %#x", reg_name(i, 4), reg_l(i));
+		}
+		*/
+	}
   print_asm("pusha");
 }
 
 make_EHelper(popa) {
-  TODO();
+	if (decinfo.isa.is_operand_size_16) {
+		POPA(w);
+	} else {
+		POPA(l);
+	}
 
   print_asm("popa");
 }

@@ -54,37 +54,44 @@ void _exit(int status) {
 }
 
 int _open(const char *path, int flags, mode_t mode) {
-  _exit(SYS_open);
-  return 0;
+	/* flags & mode are ignored temporarily */
+	return _syscall_(SYS_open, path, flags, mode);
 }
 
 int _write(int fd, void *buf, size_t count) {
-  _exit(SYS_write);
-  return 0;
+	int ret = _syscall_(SYS_write, fd, (intptr_t)buf, count);
+	return ret;
 }
 
 void *_sbrk(intptr_t increment) {
+	extern  int end;
+	static intptr_t pb = 0;
+	if (!pb)
+		pb = end;
+	intptr_t addr = pb + increment; 
+	int re = _syscall_(SYS_brk, addr, 0, 0);
+	if (!re) {
+		pb = addr;	
+		return (void *)pb - increment;
+	}
+	assert(0);
   return (void *)-1;
 }
 
 int _read(int fd, void *buf, size_t count) {
-  _exit(SYS_read);
-  return 0;
+	return _syscall_(SYS_read, fd, buf, count);
 }
 
 int _close(int fd) {
-  _exit(SYS_close);
-  return 0;
+	return _syscall_(SYS_close, fd, 0, 0);
 }
 
 off_t _lseek(int fd, off_t offset, int whence) {
-  _exit(SYS_lseek);
-  return 0;
+	return _syscall_(SYS_lseek, fd, offset, whence);
 }
 
 int _execve(const char *fname, char * const argv[], char *const envp[]) {
-  _exit(SYS_execve);
-  return 0;
+	return _syscall_(SYS_execve, fname, argv, envp);
 }
 
 // The code below is not used by Nanos-lite.
@@ -95,6 +102,7 @@ int _fstat(int fd, struct stat *buf) {
 }
 
 int _kill(int pid, int sig) {
+	assert(0);
   _exit(-SYS_kill);
   return -1;
 }

@@ -7,7 +7,7 @@
 typedef void (*DHelper) (vaddr_t *);
 
 #define OP_STR_SIZE 40
-enum { OP_TYPE_REG, OP_TYPE_MEM, OP_TYPE_IMM };
+enum { OP_TYPE_REG, OP_TYPE_MEM, OP_TYPE_IMM, OP_TYPE_CR};
 
 typedef struct {
   uint32_t type;

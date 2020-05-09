@@ -2,6 +2,8 @@
 #define __X86_REG_H__
 
 #include "common.h"
+#define EFLAGS_IF (1 << 9)
+#define EFlAGS_DEFAULT (1 << 1)
 
 #define PC_START IMAGE_START
 
@@ -23,32 +25,40 @@ typedef union  {
 			rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
 			};
 		};
-		vaddr_t pc;
+		rtlreg_t pc;
 		union{
-			uint32_t eflags;
+			rtlreg_t eflags;
 			struct {
-				uint32_t _CF:1;
-				uint32_t :1;
-				uint32_t _PF:1;
-				uint32_t :1;
-				uint32_t _AF:1;
-				uint32_t :1;
-				uint32_t _ZF:1;
-				uint32_t _SF:1;
-				uint32_t _TF:1;
-				uint32_t _IF:1;
-				uint32_t _DF:1;
-				uint32_t _OF:1;
-				uint32_t _IOPL:2;
-				uint32_t _NT:1;
-				uint32_t :1;
-				uint32_t _RF:1;
-				uint32_t _VM:1;
+				rtlreg_t _CF:1;
+				rtlreg_t :1;
+				rtlreg_t _PF:1;
+				rtlreg_t :1;
+				rtlreg_t _AF:1;
+				rtlreg_t :1;
+				rtlreg_t _ZF:1;
+				rtlreg_t _SF:1;
+				rtlreg_t _TF:1;
+				rtlreg_t _IF:1;
+				rtlreg_t _DF:1;
+				rtlreg_t _OF:1;
+				rtlreg_t _IOPL:2;
+				rtlreg_t _NT:1;
+				rtlreg_t :1;
+				rtlreg_t _RF:1;
+				rtlreg_t _VM:1;
 			};
 		};
-		uint32_t cs;
+		rtlreg_t cs, ss, ds, es, fs, gs;
+		rtlreg_t cr0, cr3;
+		bool INTR;
+
+		//hind
+		struct {
+			uint16_t limit;
+			uint32_t base;
+		} idtr;
 	};
-	uint32_t array[77];
+	rtlreg_t array[77];
 } CPU_state;
 
 static inline int check_reg_index(int index) {

@@ -3,7 +3,7 @@
 #define MAX_NR_PROC 4
 
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
-static PCB pcb_boot = {};
+PCB pcb_boot = {};
 PCB *current = NULL;
 
 void switch_boot_pcb() {
@@ -11,7 +11,7 @@ void switch_boot_pcb() {
 }
 
 void hello_fun(void *arg) {
-  int j = 1;
+  register int j = 1;
   while (1) {
     Log("Hello World from Nanos-lite for the %dth time!", j);
     j ++;
@@ -19,15 +19,36 @@ void hello_fun(void *arg) {
   }
 }
 
+static inline uint32_t get_cr3() {
+	volatile uint32_t val;
+	asm volatile ("movl %%cr3, %0" : "=r"(val));
+	return val;
+}
+
 void init_proc() {
+	context_kload(&pcb_boot, hello_fun);
+	context_uload(&pcb[0], "/bin/dummy");
+	context_uload(&pcb[1], "/bin/hello");
+
+
   switch_boot_pcb();
 
   Log("Initializing processes...");
 
-  // load program here
+  // load program
+	void *entry = (void*)pcb_boot.cp->ip ;
+  Log("Jump to entry = 0x%x", (uint32_t)entry);
+	((void(*)())entry) ();
+	//naive_uload(NULL, "/bin/dummy");
 
 }
 
 _Context* schedule(_Context *prev) {
-  return NULL;
+	/* save current context */
+	current->cp = prev;
+	assert(prev->cs == 8);
+	/* switch to destination */
+	current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+	//current = &pcb[0];
+	return current->cp;
 }

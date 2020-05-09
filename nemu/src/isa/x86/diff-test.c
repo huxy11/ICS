@@ -12,9 +12,9 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
 	for(i = 0; i < 8; ++i)
 		CMP(ref_r->gpr[i]._32, cpu.gpr[i]._32)
 	
-	Log("SYNC");
   return true;
 ne:
+	printf("error!\n");
 	for (i = 0; i < 10; ++i)
 		printf("%d:%#08x\n", i, ref_r->array[i]);
 	return false;

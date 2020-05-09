@@ -1,6 +1,6 @@
 # Compilation flags
 
-#VME = enable
+VME = enable
 
 ifeq ($(ISA), mips32)
 CROSS_COMPILE = mips-linux-gnu-
@@ -30,6 +30,8 @@ ifeq ($(LINK), dynamic)
   CFLAGS   += -fPIE
   CXXFLAGS += -fPIE
   LDFLAGS  += -fpie -shared
+else ifeq ($(NAME), init)
+  LDFLAGS += -Ttext-segment=0x60000000
 else ifeq ($(VME), enable)
   LDFLAGS += -Ttext-segment=0x40000000
 else ifeq ($(ISA), mips32)

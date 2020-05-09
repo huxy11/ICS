@@ -1,8 +1,12 @@
 #include "cpu/exec.h"
 
 make_EHelper(lidt) {
-  TODO();
-
+	rtl_lm(&s0, &id_dest->addr, 2);
+	rtl_mv((rtlreg_t*)&cpu.idtr.limit, &s0);
+	rtl_li(&ir, 2);
+	rtl_add(&id_dest->addr, &id_dest->addr, &ir);
+	rtl_lm(&s0, &id_dest->addr, id_dest->width == 2 ? 3 : 4);
+	rtl_mv(&cpu.idtr.base, &s0); 
   print_asm_template1(lidt);
 }
 
@@ -21,16 +25,18 @@ make_EHelper(mov_cr2r) {
 }
 
 make_EHelper(int) {
-  TODO();
-
+	raise_intr(id_dest->val, decinfo.seq_pc);
   print_asm("int %s", id_dest->str);
 
   difftest_skip_dut(1, 2);
 }
 
 make_EHelper(iret) {
-  TODO();
+	rtl_pop(&s0);
+	rtl_pop(&cpu.cs);
+	rtl_pop(&cpu.eflags);
 
+	rtl_j(s0);
   print_asm("iret");
 }
 

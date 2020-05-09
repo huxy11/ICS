@@ -73,6 +73,8 @@ void isa_reg_display(){
 	printf("ZF: %u\n", cpu._ZF);
 	printf("OF: %u\n", cpu._OF);
 	printf("CF: %u\n", cpu._CF);
+	printf("Cr0: 0x%08x\n", cpu.cr0);
+	printf("Cr3: 0x%08x\n", cpu.cr3);
 }
 
 uint32_t isa_reg_str2val(const char *s) {

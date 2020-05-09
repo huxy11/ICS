@@ -2,14 +2,15 @@
 #include <amdev.h>
 #include <nemu.h>
 #include <klib.h>
+static int h, w;
 
 size_t __am_video_read(uintptr_t reg, void *buf, size_t size) {
   switch (reg) {
     case _DEVREG_VIDEO_INFO: {
       _DEV_VIDEO_INFO_t *info = (_DEV_VIDEO_INFO_t *)buf;
 			uint32_t tmp = inl(SCREEN_ADDR);
-      info->width = tmp >> 16;
-      info->height = tmp & 0xffff;
+      w = info->width = tmp >> 16;
+      h = info->height = tmp & 0xffff;
       return sizeof(_DEV_VIDEO_INFO_t);
     }
   }
@@ -20,7 +21,13 @@ size_t __am_video_write(uintptr_t reg, void *buf, size_t size) {
   switch (reg) {
     case _DEVREG_VIDEO_FBCTL: {
       _DEV_VIDEO_FBCTL_t *ctl = (_DEV_VIDEO_FBCTL_t *)buf;
-
+			int32_t *vm = (int32_t *)FB_ADDR;
+			assert(ctl->y + ctl->h <= h);
+			assert(ctl->x + ctl->w <= w);
+			for (int j = 0; j < ctl->h; ++j)
+				for (int i = 0; i < ctl->w; ++i){
+					vm[w*(ctl->y + j) + (ctl->x + i)] = ctl->pixels[ctl->w * j + i];
+				}
       if (ctl->sync) {
         outl(SYNC_ADDR, 0);
       }

@@ -36,11 +36,11 @@ static int cmd_si(char *args) {
 	uint32_t n = 1;
 	if (arg && atoi(arg))
 		n = atoi(arg);
-	/*
-	else 
-		Log("Invalid arg for cmd_si execute once.");
-		*/
 	cpu_exec(n);
+	if (n != 1)
+		printf("execute %d times\n", n);
+	else
+		printf("pc = %#x\n", cpu.pc);
 	return 0;
 }
 static int cmd_i(char* args) {
@@ -65,9 +65,16 @@ static int cmd_x(char *args) {
 			if (arg && atox(arg)) {
 				uint64_t addr = atox(arg);
 				int i = 0;
+				/*
 				for (i = 0; i < n; ++i) {
-					printf("0x%lX:%02x%c", (addr+i),vaddr_read(addr+i, 1), \
-							((i+1) % 8 == 0 || i == n -1) ? '\n' : ' ');	
+					printf("0x%lX:%02x(%c)%c", (addr+i),vaddr_read(addr+i, 1), \
+							vaddr_read(addr+i, 1), ((i+1) % 4 == 0 || i == n -1) ? '\n' : ' ');	
+				}
+				*/
+				for (i = 0; i < n; ++i) {
+					if (i % 4 ==0)
+						printf("0x%lx:", addr+i);
+					printf("%02x%c", vaddr_read(addr+i, 1), ((i+1) % 4 == 0 || i == n -1) ? '\n' : ' ');	
 				}
 				return 0;
 			}
@@ -132,6 +139,93 @@ static int cmd_dwp(char* args) {
 	}
 	return 0;
 }
+static int cmd_sf(char* args) {
+	struct sf_t{
+		uint32_t addr;
+		uint32_t val;
+		bool flag;
+	} sf[255] = {0, };
+	char *arg = strtok(NULL, " ");
+	int cnt = 0, max = 0;
+	if (!arg)
+		max = 3;
+	else
+		max = atoi(arg); 
+	rtlreg_t bp = cpu.ebp, sp = cpu.esp;
+	/* load stack frame into sf[] */
+	while(bp && sp <= bp && max && cnt < 255) {	
+		sf[cnt].addr = sp;
+		sf[cnt++].val = vaddr_read((vaddr_t)sp, 4);
+		if (sp == bp) {
+			--max;
+			bp = sf[cnt - 1].val;
+			sf[cnt - 1].flag = 1;
+		}
+		sp += 4;
+	}	
+	/* print sf[] */
+	while(--cnt>=0) {
+		if (sf[cnt].flag)
+			printf("----------------\n");
+		printf("%#x:%#x\n", sf[cnt].addr, sf[cnt].val);
+		if (sf[cnt].flag)
+			printf("----------------\n");
+	}
+	return 0;
+}
+static int cmd_pd(char* args) {
+	if (!cpu.cr0)
+		return printf("page not on");
+	assert(cpu.cr3);
+	int diri = 0, tabi = 0;
+	uint32_t pde, pte;
+	for (diri = 0; diri < 1024; ++diri) {
+		pde = vaddr_read(cpu.cr3 + diri * 4, 4); 
+		if (pde & 1) {
+			printf("0x%x\n", pde);
+			for (tabi = 0; tabi < 2; ++tabi) {
+				pte = vaddr_read((pde & 0xFFFFF000) + tabi * 4, 4);
+				if (pte & 1)
+					printf("\t0x%x:\t0x%x->0x%x\n", pte, (pte & 0xFFFFF000),(pte & 0xFFFFF000)+0xFFF );
+			}
+		}
+	}
+	return 0;
+}
+/*
+static int cmd_sf(char* args) {
+	uint64_t s[255] = {0, };
+	int cnt = 0;
+	uint64_t* p = s;
+	rtlreg_t bp = cpu.ebp, sp = cpu.esp;
+	if (sp == 0) {
+		Log("No valid stack generated!");
+		return 0;
+	}
+	Log("sf starts at bp = %#x, sp = %#x", bp, sp);
+	while(bp) {
+		*++p = vaddr_read((vaddr_t)sp, 4);
+		if (sp == bp) {
+			*++p = 0xFFFF000000000000 | sp;
+			bp = vaddr_read((vaddr_t)sp, 4);
+			cnt++;
+		}
+		sp += 4;
+		cnt++;
+		if (cnt > 254)
+			break;
+	}
+	while (p > (uint64_t*)s)	{
+		if (*p & 0xFFFF000000000000) {
+			*p &= 0x00000000FFFFFFFF;
+			printf("-----------------\n");
+		}
+		printf("%#lx\n", (uint64_t)p, *p);
+		--p;
+	}
+	return 0;
+}
+*/
 static int cmd_test(char *args) {
 	char *arg = strtok(NULL, " ");
 	int32_t i;
@@ -180,6 +274,8 @@ static struct {
 	{ "expr", "Calculate expression", cmd_expr},
 	{ "wp", "Set a watch point", cmd_wp},
 	{ "dwp", "Remove a watch point", cmd_dwp},
+	{ "sf", "Print stack frame", cmd_sf},
+	{ "pd", "Print pages", cmd_pd},
 	{ "test", "Test only", cmd_test},
   { "q", "Exit NEMU", cmd_q },
 

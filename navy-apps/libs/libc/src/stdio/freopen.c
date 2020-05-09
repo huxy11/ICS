@@ -89,6 +89,7 @@ _freopen_r (struct _reent *ptr,
   /* We can't use the _newlib_flockfile_XXX macros here due to the
      interlocked locking with the sfp_lock. */
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
+	assert(0);
   int __oldcancel;
   pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldcancel);
 #endif

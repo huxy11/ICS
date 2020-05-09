@@ -17,5 +17,10 @@ typedef union {
 } PCB;
 
 extern PCB *current;
+extern PCB pcb_boot;
+void context_kload(PCB*, void*);
+void context_uload(PCB*, const char*);
+void naive_uload(_AddressSpace* ,const char*);
+_Context* schedule(_Context*);
 
 #endif
