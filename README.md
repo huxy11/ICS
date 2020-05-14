@@ -28,7 +28,7 @@
 
     **Decoupled processing of instructions.**
 
-     Take an essential instructions set, mov, as an example. In x86-isa, mov includes a lot of specific instructions.![image-readme1](readmerc/readme1.png)
+     Take an essential instructions set, mov, as an example. In x86-isa, mov includes a lot of specific instructions.![image-readme1](http://github.com/huxy11/your-repository/raw/master/readmerc/readme1.png)
 
     As above, there are a variety of specific instructions. Different mov instruction has different operands but the same execution(move data from one operand to another). Thus we could abstract two steps and decouple them respectively into:
 
